@@ -1,5 +1,7 @@
 package slog
 
+import "io"
+
 // Interface represents the API of both Logger and Entry.
 type Interface interface {
 	WithFields(fields Fielder) *Entry
@@ -12,4 +14,5 @@ type Interface interface {
 	Fatal(msg string)
 	Panic(msg string)
 	Trace(level Level, msg string) *Entry
+	Writer(level Level) *io.PipeWriter
 }
