@@ -14,8 +14,8 @@ type Entry struct {
 	Logger     *Logger   `json:"-"`
 	Fields     Fields    `json:"fields"`
 	Level      Level     `json:"level"`
-	Timestamp  time.Time `json:"timestamp"`
-	Message    string    `json:"message"`
+	Time       time.Time `json:"time"`
+	Message    string    `json:"msg"`
 	start      time.Time
 	fields     []Fields
 	traceLevel Level
@@ -118,10 +118,10 @@ func (e *Entry) mergedFields() Fields {
 // finalize returns a copy of the Entry with Fields merged.
 func (e *Entry) finalize(level Level, msg string) *Entry {
 	return &Entry{
-		Logger:    e.Logger,
-		Fields:    e.mergedFields(),
-		Level:     level,
-		Message:   msg,
-		Timestamp: time.Now(),
+		Logger:  e.Logger,
+		Fields:  e.mergedFields(),
+		Level:   level,
+		Message: msg,
+		Time:    time.Now(),
 	}
 }

@@ -31,7 +31,7 @@ func TestLevel_MarshalJSON(t *testing.T) {
 		Fields:  Fields{},
 	}
 
-	expect := `{"fields":{},"level":"info","timestamp":"0001-01-01T00:00:00Z","message":"hello"}`
+	expect := `{"fields":{},"level":"info","time":"0001-01-01T00:00:00Z","msg":"hello"}`
 
 	b, err := json.Marshal(e)
 	assert.NoError(t, err)
