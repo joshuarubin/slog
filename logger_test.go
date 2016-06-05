@@ -229,6 +229,20 @@ func BenchmarkLogger_small_text(b *testing.B) {
 	}
 }
 
+func BenchmarkLogger_small_multi(b *testing.B) {
+	l := slog.New()
+	l.RegisterHandler(slog.InfoLevel, text.New(ioutil.Discard))
+	l.RegisterHandler(slog.InfoLevel, text.New(ioutil.Discard))
+	l.RegisterHandler(slog.InfoLevel, text.New(ioutil.Discard))
+	l.RegisterHandler(slog.InfoLevel, text.New(ioutil.Discard))
+	l.RegisterHandler(slog.InfoLevel, text.New(ioutil.Discard))
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		l.Info("login")
+	}
+}
+
 func BenchmarkLogger_medium(b *testing.B) {
 	l := slog.New()
 	l.RegisterHandler(slog.InfoLevel, discard.New())
