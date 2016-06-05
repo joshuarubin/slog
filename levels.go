@@ -30,8 +30,12 @@ var levelNames = [...]string{
 
 // String implements io.Stringer.
 func (l Level) String() string {
-	if l < PanicLevel || l > DebugLevel {
-		return "invalid"
+	if l < PanicLevel {
+		l = PanicLevel
+	}
+
+	if l > DebugLevel {
+		l = DebugLevel
 	}
 
 	return levelNames[l]
@@ -49,11 +53,17 @@ func ParseLevel(s string, defaultLevel Level) Level {
 	}
 
 	if i, err := strconv.Atoi(s); err == nil {
-		if i >= int(PanicLevel) && i <= int(DebugLevel) {
-			return Level(i)
+		l := Level(i)
+
+		if l < PanicLevel {
+			l = PanicLevel
 		}
 
-		return defaultLevel
+		if l > DebugLevel {
+			l = DebugLevel
+		}
+
+		return l
 	}
 
 	r, _ := utf8.DecodeRuneInString(s)
