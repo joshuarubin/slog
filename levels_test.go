@@ -1,4 +1,4 @@
-package log
+package slog
 
 import (
 	"encoding/json"
@@ -9,20 +9,18 @@ import (
 
 func TestParseLevel(t *testing.T) {
 	{
-		level, err := ParseLevel("info")
-		assert.NoError(t, err)
+		level := ParseLevel("info", WarnLevel)
 		assert.Equal(t, InfoLevel, level)
 	}
 
 	{
-		level, err := ParseLevel("warn")
-		assert.NoError(t, err)
+		level := ParseLevel("warn", WarnLevel)
 		assert.Equal(t, WarnLevel, level)
 	}
 
 	{
-		_, err := ParseLevel("whatever")
-		assert.Error(t, err)
+		level := ParseLevel("whatever", WarnLevel)
+		assert.Equal(t, WarnLevel, level)
 	}
 }
 

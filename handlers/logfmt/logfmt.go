@@ -6,8 +6,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/apex/log"
 	"github.com/go-logfmt/logfmt"
+	"jrubin.io/slog"
 )
 
 // Default handler outputting to stderr.
@@ -26,8 +26,8 @@ func New(w io.Writer) *Handler {
 	}
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e *log.Entry) error {
+// HandleLog implements slog.Handler.
+func (h *Handler) HandleLog(e *slog.Entry) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 

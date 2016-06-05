@@ -1,9 +1,7 @@
 // Package discard implements a no-op handler useful for benchmarks and tests.
 package discard
 
-import (
-	"github.com/apex/log"
-)
+import "jrubin.io/slog"
 
 // Default handler.
 var Default = New()
@@ -16,7 +14,7 @@ func New() *Handler {
 	return &Handler{}
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e *log.Entry) error {
+// HandleLog implements slog.Handler.
+func (h *Handler) HandleLog(e *slog.Entry) error {
 	return nil
 }

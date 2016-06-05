@@ -1,4 +1,4 @@
-package log
+package slog
 
 // Interface represents the API of both Logger and Entry.
 type Interface interface {
@@ -10,10 +10,6 @@ type Interface interface {
 	Warn(msg string)
 	Error(msg string)
 	Fatal(msg string)
-	Debugf(msg string, v ...interface{})
-	Infof(msg string, v ...interface{})
-	Warnf(msg string, v ...interface{})
-	Errorf(msg string, v ...interface{})
-	Fatalf(msg string, v ...interface{})
-	Trace(msg string) *Entry
+	Panic(msg string)
+	Trace(level Level, msg string) *Entry
 }

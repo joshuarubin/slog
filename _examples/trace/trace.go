@@ -4,21 +4,22 @@ import (
 	"os"
 	"time"
 
-	"github.com/apex/log"
-	"github.com/apex/log/handlers/text"
+	"jrubin.io/slog"
+	"jrubin.io/slog/handlers/text"
 )
 
-func work(ctx log.Interface) (err error) {
-	path := "Readme.md"
-	defer ctx.WithField("path", path).Trace("opening").Stop(&err)
+func work(ctx slog.Interface) (err error) {
+	path := "README.md"
+	defer ctx.WithField("path", path).Trace(slog.InfoLevel, "opening").Stop(&err)
 	_, err = os.Open(path)
 	return
 }
 
 func main() {
-	log.SetHandler(text.New(os.Stderr))
+	l := slog.New()
+	l.RegisterHandler(slog.InfoLevel, text.New(os.Stderr))
 
-	ctx := log.WithFields(log.Fields{
+	ctx := l.WithFields(slog.Fields{
 		"app": "myapp",
 		"env": "prod",
 	})

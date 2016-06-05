@@ -5,13 +5,13 @@ package memory
 import (
 	"sync"
 
-	"github.com/apex/log"
+	"jrubin.io/slog"
 )
 
 // Handler implementation.
 type Handler struct {
 	mu      sync.Mutex
-	Entries []*log.Entry
+	Entries []*slog.Entry
 }
 
 // New handler.
@@ -19,8 +19,10 @@ func New() *Handler {
 	return &Handler{}
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e *log.Entry) error {
+var _ slog.Handler = (*Handler)(nil)
+
+// HandleLog implements slog.Handler.
+func (h *Handler) HandleLog(e *slog.Entry) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	h.Entries = append(h.Entries, e)

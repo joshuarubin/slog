@@ -1,6 +1,6 @@
-package log
+package slog
 
-import stdlog "log"
+import "log"
 
 // assert interface compliance.
 var _ Interface = (*Logger)(nil)
@@ -37,10 +37,36 @@ type Handler interface {
 	HandleLog(*Entry) error
 }
 
-// Logger represents a logger with configurable Level and Handler.
+// Logger represents a logger. It will not do anything useful unless a handler
+// has been registered with RegisterHandler.
 type Logger struct {
-	Handler Handler
-	Level   Level
+	handlers [len(levelNames)][]Handler
+}
+
+// New allocates a new Logger.
+func New() *Logger {
+	return &Logger{}
+}
+
+// RegisterHandler adds a new Handler and specifies the maximum Level that the
+// handler will be passed log entries for
+func (l *Logger) RegisterHandler(maxLevel Level, handler Handler) {
+	if maxLevel < PanicLevel {
+		maxLevel = PanicLevel
+	}
+
+	if maxLevel > DebugLevel {
+		maxLevel = DebugLevel
+	}
+
+	for level := PanicLevel; level <= maxLevel; level++ {
+		if handlers := l.handlers[level]; handlers != nil {
+			l.handlers[level] = append(handlers, handler)
+			continue
+		}
+
+		l.handlers[level] = []Handler{handler}
+	}
 }
 
 // WithFields returns a new entry with `fields` set.
@@ -83,46 +109,30 @@ func (l *Logger) Fatal(msg string) {
 	NewEntry(l).Fatal(msg)
 }
 
-// Debugf level formatted message.
-func (l *Logger) Debugf(msg string, v ...interface{}) {
-	NewEntry(l).Debugf(msg, v...)
-}
-
-// Infof level formatted message.
-func (l *Logger) Infof(msg string, v ...interface{}) {
-	NewEntry(l).Infof(msg, v...)
-}
-
-// Warnf level formatted message.
-func (l *Logger) Warnf(msg string, v ...interface{}) {
-	NewEntry(l).Warnf(msg, v...)
-}
-
-// Errorf level formatted message.
-func (l *Logger) Errorf(msg string, v ...interface{}) {
-	NewEntry(l).Errorf(msg, v...)
-}
-
-// Fatalf level formatted message, followed by an exit.
-func (l *Logger) Fatalf(msg string, v ...interface{}) {
-	NewEntry(l).Fatalf(msg, v...)
+// Panic level message, followed by a panic.
+func (l *Logger) Panic(msg string) {
+	NewEntry(l).Panic(msg)
 }
 
 // Trace returns a new entry with a Stop method to fire off
 // a corresponding completion log, useful with defer.
-func (l *Logger) Trace(msg string) *Entry {
-	return NewEntry(l).Trace(msg)
+func (l *Logger) Trace(level Level, msg string) *Entry {
+	return NewEntry(l).Trace(level, msg)
 }
 
 // log the message, invoking the handler. We clone the entry here
 // to bypass the overhead in Entry methods when the level is not
 // met.
 func (l *Logger) log(level Level, e *Entry, msg string) {
-	if level < l.Level {
+	handlers := l.handlers[level]
+	if len(handlers) == 0 {
 		return
 	}
 
-	if err := l.Handler.HandleLog(e.finalize(level, msg)); err != nil {
-		stdlog.Printf("error logging: %s", err)
+	e = e.finalize(level, msg)
+	for _, h := range handlers {
+		if err := h.HandleLog(e); err != nil {
+			log.Printf("error logging: %s", err)
+		}
 	}
 }

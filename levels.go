@@ -1,7 +1,9 @@
-package log
+package slog
 
 import (
-	"errors"
+	"strconv"
+	"unicode"
+	"unicode/utf8"
 )
 
 // Level of severity.
@@ -9,23 +11,29 @@ type Level int
 
 // Log levels.
 const (
-	DebugLevel Level = iota
-	InfoLevel
-	WarnLevel
-	ErrorLevel
+	PanicLevel Level = iota
 	FatalLevel
+	ErrorLevel
+	WarnLevel
+	InfoLevel
+	DebugLevel
 )
 
 var levelNames = [...]string{
-	DebugLevel: "debug",
-	InfoLevel:  "info",
-	WarnLevel:  "warn",
-	ErrorLevel: "error",
+	PanicLevel: "panic",
 	FatalLevel: "fatal",
+	ErrorLevel: "error",
+	WarnLevel:  "warn",
+	InfoLevel:  "info",
+	DebugLevel: "debug",
 }
 
 // String implements io.Stringer.
 func (l Level) String() string {
+	if l < PanicLevel || l > DebugLevel {
+		return "invalid"
+	}
+
 	return levelNames[l]
 }
 
@@ -35,19 +43,36 @@ func (l Level) MarshalJSON() ([]byte, error) {
 }
 
 // ParseLevel parses level string.
-func ParseLevel(s string) (Level, error) {
-	switch s {
-	case "debug":
-		return DebugLevel, nil
-	case "info":
-		return InfoLevel, nil
-	case "warn", "warning":
-		return WarnLevel, nil
-	case "error":
-		return ErrorLevel, nil
-	case "fatal":
-		return FatalLevel, nil
-	default:
-		return -1, errors.New("invalid level")
+func ParseLevel(s string, defaultLevel Level) Level {
+	if len(s) == 0 {
+		return defaultLevel
 	}
+
+	if i, err := strconv.Atoi(s); err == nil {
+		if i >= int(PanicLevel) && i <= int(DebugLevel) {
+			return Level(i)
+		}
+
+		return defaultLevel
+	}
+
+	r, _ := utf8.DecodeRuneInString(s)
+	r = unicode.ToLower(r)
+
+	switch r {
+	case 'd':
+		return DebugLevel
+	case 'i':
+		return InfoLevel
+	case 'w':
+		return WarnLevel
+	case 'e':
+		return ErrorLevel
+	case 'f':
+		return FatalLevel
+	case 'p':
+		return PanicLevel
+	}
+
+	return defaultLevel
 }

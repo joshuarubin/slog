@@ -7,22 +7,16 @@ import (
 	"os"
 	"sort"
 	"sync"
-	"time"
 
-	"github.com/apex/log"
+	"jrubin.io/slog"
 )
 
 // Default handler outputting to stderr.
 var Default = New(os.Stderr)
 
-// start time.
-var start = time.Now()
-
 // colors.
 const (
-	none   = 0
 	red    = 31
-	green  = 32
 	yellow = 33
 	blue   = 34
 	gray   = 37
@@ -30,20 +24,22 @@ const (
 
 // Colors mapping.
 var Colors = [...]int{
-	log.DebugLevel: gray,
-	log.InfoLevel:  blue,
-	log.WarnLevel:  yellow,
-	log.ErrorLevel: red,
-	log.FatalLevel: red,
+	slog.DebugLevel: gray,
+	slog.InfoLevel:  blue,
+	slog.WarnLevel:  yellow,
+	slog.ErrorLevel: red,
+	slog.FatalLevel: red,
+	slog.PanicLevel: red,
 }
 
 // Strings mapping.
 var Strings = [...]string{
-	log.DebugLevel: "•",
-	log.InfoLevel:  "•",
-	log.WarnLevel:  "•",
-	log.ErrorLevel: "⨯",
-	log.FatalLevel: "⨯",
+	slog.DebugLevel: "•",
+	slog.InfoLevel:  "•",
+	slog.WarnLevel:  "•",
+	slog.ErrorLevel: "⨯",
+	slog.FatalLevel: "⨯",
+	slog.PanicLevel: "⨯",
 }
 
 // field used for sorting.
@@ -74,8 +70,10 @@ func New(w io.Writer) *Handler {
 	}
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e *log.Entry) error {
+var _ slog.Handler = (*Handler)(nil)
+
+// HandleLog implements slog.Handler.
+func (h *Handler) HandleLog(e *slog.Entry) error {
 	color := Colors[e.Level]
 	level := Strings[e.Level]
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/apex/log"
+	"jrubin.io/slog"
 )
 
 // Default handler outputting to stderr.
@@ -26,8 +26,10 @@ func New(w io.Writer) *Handler {
 	}
 }
 
-// HandleLog implements log.Handler.
-func (h *Handler) HandleLog(e *log.Entry) error {
+var _ slog.Handler = (*Handler)(nil)
+
+// HandleLog implements slog.Handler.
+func (h *Handler) HandleLog(e *slog.Entry) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	return h.enc.Encode(e)

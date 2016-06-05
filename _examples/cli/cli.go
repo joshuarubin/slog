@@ -4,15 +4,15 @@ import (
 	"errors"
 	"time"
 
-	"github.com/apex/log"
-	"github.com/apex/log/handlers/cli"
+	"jrubin.io/slog"
+	"jrubin.io/slog/handlers/cli"
 )
 
 func main() {
-	log.SetHandler(cli.Default)
-	log.SetLevel(log.DebugLevel)
+	l := slog.New()
+	l.RegisterHandler(slog.DebugLevel, cli.Default)
 
-	ctx := log.WithFields(log.Fields{
+	ctx := l.WithFields(slog.Fields{
 		"file": "something.png",
 		"type": "image/png",
 		"user": "tobi",
