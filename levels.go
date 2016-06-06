@@ -46,6 +46,17 @@ func (l Level) MarshalJSON() ([]byte, error) {
 	return []byte(`"` + l.String() + `"`), nil
 }
 
+// MarshalText implements encoding.TextMarshaler
+func (l Level) MarshalText() ([]byte, error) {
+	return []byte(l.String()), nil
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler
+func (l *Level) UnmarshalText(text []byte) error {
+	*l = ParseLevel(string(text), WarnLevel)
+	return nil
+}
+
 // ParseLevel parses level string.
 func ParseLevel(s string, defaultLevel Level) Level {
 	if len(s) == 0 {
