@@ -2,7 +2,6 @@ package slog
 
 import (
 	"errors"
-	"io"
 	"os"
 	"time"
 )
@@ -77,10 +76,6 @@ func (e *Entry) Fatal(msg string) {
 func (e *Entry) Panic(msg string) {
 	e.Logger.log(PanicLevel, e, msg)
 	panic(errors.New(msg))
-}
-
-func (e *Entry) Writer(level Level) *io.PipeWriter {
-	return e.Logger.Writer(level)
 }
 
 // Trace returns a new entry with a Stop method to fire off
