@@ -111,7 +111,7 @@ func TestLogger_Trace_info(t *testing.T) {
 	l := slog.New()
 	l.RegisterHandler(slog.InfoLevel, h)
 
-	func() (err error) {
+	_ = func() (err error) {
 		defer l.WithField("file", "sloth.png").Trace(slog.InfoLevel, "upload").Stop(&err)
 		return nil
 	}()
@@ -140,7 +140,7 @@ func TestLogger_Trace_error(t *testing.T) {
 	l := slog.New()
 	l.RegisterHandler(slog.InfoLevel, h)
 
-	func() (err error) {
+	_ = func() (err error) {
 		defer l.WithField("file", "sloth.png").Trace(slog.InfoLevel, "upload").Stop(&err)
 		return fmt.Errorf("boom")
 	}()

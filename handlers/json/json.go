@@ -26,8 +26,6 @@ func New(w io.Writer) *Handler {
 	}
 }
 
-var _ slog.Handler = (*Handler)(nil)
-
 // HandleLog implements slog.Handler.
 func (h *Handler) HandleLog(e *slog.Entry) error {
 	h.mu.Lock()

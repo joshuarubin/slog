@@ -64,8 +64,8 @@ type Handler struct {
 	DisableColors    bool
 	DisableTimestamp bool
 	FullTimestamp    bool
-	TimestampFormat  string
 	DisableSorting   bool
+	TimestampFormat  string
 }
 
 // New handler.

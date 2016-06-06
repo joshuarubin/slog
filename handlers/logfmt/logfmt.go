@@ -31,15 +31,23 @@ func (h *Handler) HandleLog(e *slog.Entry) error {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
-	h.enc.EncodeKeyval("time", e.Time)
-	h.enc.EncodeKeyval("level", e.Level.String())
-	h.enc.EncodeKeyval("message", e.Message)
-
-	for k, v := range e.Fields {
-		h.enc.EncodeKeyval(k, v)
+	if err := h.enc.EncodeKeyval("time", e.Time); err != nil {
+		return err
 	}
 
-	h.enc.EndRecord()
+	if err := h.enc.EncodeKeyval("level", e.Level.String()); err != nil {
+		return err
+	}
 
-	return nil
+	if err := h.enc.EncodeKeyval("message", e.Message); err != nil {
+		return err
+	}
+
+	for k, v := range e.Fields {
+		if err := h.enc.EncodeKeyval(k, v); err != nil {
+			return err
+		}
+	}
+
+	return h.enc.EndRecord()
 }
