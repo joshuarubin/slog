@@ -50,7 +50,7 @@ func New() *Logger {
 
 // RegisterHandler adds a new Handler and specifies the maximum Level that the
 // handler will be passed log entries for
-func (l *Logger) RegisterHandler(maxLevel Level, handler Handler) {
+func (l *Logger) RegisterHandler(maxLevel Level, handler Handler) *Logger {
 	if maxLevel < PanicLevel {
 		maxLevel = PanicLevel
 	}
@@ -67,6 +67,8 @@ func (l *Logger) RegisterHandler(maxLevel Level, handler Handler) {
 
 		l.handlers[level] = []Handler{handler}
 	}
+
+	return l
 }
 
 // WithFields returns a new entry with `fields` set.

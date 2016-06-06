@@ -20,14 +20,10 @@ import (
 // Default handler outputting to stderr.
 var Default = New(os.Stderr)
 
-// Logger returns a logger configured to output text at InfoLevel or higher to
-// stderr. There isn't a great way to change the log level. Most applications
-// will want control over the handlers, levels and writers, so using this is
-// probably a crutch.
-func Logger() *slog.Logger {
-	l := slog.New()
-	l.RegisterHandler(slog.InfoLevel, Default)
-	return l
+// Logger returns a logger configured to output text at level or higher to
+// stderr.
+func Logger(level slog.Level) *slog.Logger {
+	return slog.New().RegisterHandler(level, Default)
 }
 
 var (
