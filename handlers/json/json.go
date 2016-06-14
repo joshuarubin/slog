@@ -13,6 +13,12 @@ import (
 // Default handler outputting to stderr.
 var Default = New(os.Stderr)
 
+// Logger returns a logger configured to output json at level or higher to
+// stderr.
+func Logger(level slog.Level) *slog.Logger {
+	return slog.New().RegisterHandler(level, Default)
+}
+
 // Handler implementation.
 type Handler struct {
 	mu  sync.Mutex
