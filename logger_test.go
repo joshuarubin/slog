@@ -159,7 +159,7 @@ func TestLogger_Trace_error(t *testing.T) {
 		assert.Equal(t, e.Message, "upload")
 		assert.Equal(t, e.Level, slog.ErrorLevel)
 		assert.Equal(t, "sloth.png", e.Fields["file"])
-		assert.Equal(t, "boom", e.Fields["error"])
+		assert.Equal(t, "boom", e.Fields["error"].(error).Error())
 		assert.IsType(t, time.Duration(0), e.Fields["duration"])
 	}
 }
