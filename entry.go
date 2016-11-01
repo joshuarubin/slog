@@ -68,14 +68,18 @@ func (e *Entry) Error(msg string) {
 
 // Fatal level message, followed by an exit.
 func (e *Entry) Fatal(msg string) {
-	e.Logger.log(FatalLevel, e, msg)
-	os.Exit(1)
+	if e.Logger != Nil {
+		e.Logger.log(FatalLevel, e, msg)
+		os.Exit(1)
+	}
 }
 
 // Panic level message, followed by a panic.
 func (e *Entry) Panic(msg string) {
-	e.Logger.log(PanicLevel, e, msg)
-	panic(errors.New(msg))
+	if e.Logger != Nil {
+		e.Logger.log(PanicLevel, e, msg)
+		panic(errors.New(msg))
+	}
 }
 
 // IfError returns an Interface that will only log if err is not nil
