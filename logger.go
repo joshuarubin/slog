@@ -116,6 +116,15 @@ func (l *Logger) Panic(msg string) {
 	NewEntry(l).Panic(msg)
 }
 
+// IfError returns an Interface that will only log if err is not nil
+func (l *Logger) IfError(err error) Interface {
+	if err != nil {
+		return l.WithError(err)
+	}
+
+	return Nil
+}
+
 // Trace returns a new entry with a Stop method to fire off
 // a corresponding completion log, useful with defer.
 func (l *Logger) Trace(level Level, msg string) *Entry {

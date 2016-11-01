@@ -11,5 +11,6 @@ type Interface interface {
 	Error(msg string)
 	Fatal(msg string)
 	Panic(msg string)
+	IfError(error) Interface
 	Trace(level Level, msg string) *Entry
 }
