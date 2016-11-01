@@ -138,3 +138,10 @@ func (l *Logger) log(level Level, e *Entry, msg string) {
 		}
 	}
 }
+
+// Nil logger that satisfies zlog.Interface but sends all messages to the bit
+// bucket
+var Nil = &Logger{}
+
+// assert interface compliance.
+var _ Interface = Nil
