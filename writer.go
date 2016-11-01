@@ -1,17 +1,60 @@
 package slog
 
 import (
-	"bufio"
+	"bytes"
 	"io"
 	"runtime"
+	"sync"
 )
 
-// Writer returns an io.Pipe where each line written to that writer will be
-// printed using the handlers for the given Level. It is the caller's
-// responsibility to close it.
-func (logger *Logger) Writer(level Level) *io.PipeWriter {
-	reader, writer := io.Pipe()
+type syncWriter struct {
+	PrintFunc func(string)
+	buf       bytes.Buffer
+	mu        sync.Mutex
+}
 
+func (w *syncWriter) printLines() {
+	for {
+		i := bytes.IndexByte(w.buf.Bytes(), '\n')
+		if i < 0 {
+			break
+		}
+
+		data := w.buf.Next(i + 1)
+
+		// strip trailing "\r\n"
+		for _, b := range []byte("\n\r") { // yes, I know "\n\r" is backwards
+			if len(data) > 0 && data[len(data)-1] == b {
+				data = data[:len(data)-1]
+			}
+		}
+
+		w.PrintFunc(string(data))
+	}
+}
+
+func (w *syncWriter) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	n, err := w.buf.Write(p)
+	w.printLines()
+	w.mu.Unlock()
+
+	return n, err
+}
+
+func (w *syncWriter) Close() error {
+	w.mu.Lock()
+	w.printLines()
+	w.PrintFunc(w.buf.String())
+	w.buf.Reset()
+	w.mu.Unlock()
+	return nil
+}
+
+// Writer returns an io.WriteCloser where each line written to that writer will
+// be printed using the handlers for the given Level. It is the caller's
+// responsibility to close it.
+func (logger *Logger) Writer(level Level) io.WriteCloser {
 	if level < PanicLevel {
 		level = PanicLevel
 	}
@@ -36,25 +79,15 @@ func (logger *Logger) Writer(level Level) *io.PipeWriter {
 		printFunc = logger.Panic
 	}
 
-	go logger.writerScanner(reader, printFunc)
-	runtime.SetFinalizer(writer, writerFinalizer)
-
-	return writer
-}
-
-func (logger *Logger) writerScanner(reader io.ReadCloser, printFunc func(msg string)) {
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		printFunc(scanner.Text())
+	w := &syncWriter{
+		PrintFunc: printFunc,
 	}
 
-	if err := scanner.Err(); err != nil {
-		logger.WithError(err).Error("Error while reading from Writer")
-	}
+	runtime.SetFinalizer(w, writerFinalizer)
 
-	_ = reader.Close()
+	return w
 }
 
-func writerFinalizer(writer *io.PipeWriter) {
+func writerFinalizer(writer *syncWriter) {
 	_ = writer.Close()
 }
