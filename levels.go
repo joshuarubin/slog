@@ -28,6 +28,12 @@ var levelNames = [...]string{
 	DebugLevel: "debug",
 }
 
+// Set implements cli.Generic
+func (l *Level) Set(value string) error {
+	*l = ParseLevel(value, WarnLevel)
+	return nil
+}
+
 // String implements io.Stringer.
 func (l Level) String() string {
 	if l < PanicLevel {
