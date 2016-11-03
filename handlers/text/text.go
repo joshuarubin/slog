@@ -133,7 +133,9 @@ func (h *Handler) HandleLog(e *slog.Entry) error {
 func (h *Handler) printColored(e *slog.Entry, fields []field, timestampFormat string) {
 	color := Colors[e.Level]
 
-	if !h.FullTimestamp {
+	if h.DisableTimestamp {
+		fmt.Fprintf(h.Writer, "\033[%dm%5s\033[0m %-25s", color, strings.ToUpper(e.Level.String()), e.Message)
+	} else if !h.FullTimestamp {
 		ts := time.Since(start) / time.Second
 		fmt.Fprintf(h.Writer, "\033[%dm%5s\033[0m[%04d] %-25s", color, strings.ToUpper(e.Level.String()), ts, e.Message)
 	} else {
