@@ -2,15 +2,22 @@ package slog
 
 import (
 	"bytes"
-	"io"
 	"runtime"
 	"sync"
 )
 
 type syncWriter struct {
-	PrintFunc func(string)
+	prefix    string
+	printFunc func(string)
 	buf       bytes.Buffer
 	mu        sync.Mutex
+}
+
+func (w *syncWriter) Prefix(prefix string) PrefixWriteCloser {
+	w.mu.Lock()
+	w.prefix += prefix
+	w.mu.Unlock()
+	return w
 }
 
 func (w *syncWriter) printLines() {
@@ -29,7 +36,13 @@ func (w *syncWriter) printLines() {
 			}
 		}
 
-		w.PrintFunc(string(data))
+		w.print(string(data))
+	}
+}
+
+func (w *syncWriter) print(data string) {
+	if len(data) > 0 {
+		w.printFunc(w.prefix + data)
 	}
 }
 
@@ -45,7 +58,7 @@ func (w *syncWriter) Write(p []byte) (int, error) {
 func (w *syncWriter) Close() error {
 	w.mu.Lock()
 	w.printLines()
-	w.PrintFunc(w.buf.String())
+	w.print(w.buf.String())
 	w.buf.Reset()
 	w.mu.Unlock()
 	return nil
@@ -54,7 +67,14 @@ func (w *syncWriter) Close() error {
 // Writer returns an io.WriteCloser where each line written to that writer will
 // be printed using the handlers for the given Level. It is the caller's
 // responsibility to close it.
-func (logger *Logger) Writer(level Level) io.WriteCloser {
+func (l *Logger) Writer(level Level) PrefixWriteCloser {
+	return NewEntry(l).Writer(level)
+}
+
+// Writer returns an io.WriteCloser where each line written to that writer will
+// be printed using the handlers for the given Level. It is the caller's
+// responsibility to close it.
+func (e *Entry) Writer(level Level) PrefixWriteCloser {
 	if level < PanicLevel {
 		level = PanicLevel
 	}
@@ -66,21 +86,21 @@ func (logger *Logger) Writer(level Level) io.WriteCloser {
 	var printFunc func(msg string)
 	switch level {
 	case DebugLevel:
-		printFunc = logger.Debug
+		printFunc = e.Debug
 	case InfoLevel:
-		printFunc = logger.Info
+		printFunc = e.Info
 	case WarnLevel:
-		printFunc = logger.Warn
+		printFunc = e.Warn
 	case ErrorLevel:
-		printFunc = logger.Error
+		printFunc = e.Error
 	case FatalLevel:
-		printFunc = logger.Fatal
+		printFunc = e.Fatal
 	case PanicLevel:
-		printFunc = logger.Panic
+		printFunc = e.Panic
 	}
 
 	w := &syncWriter{
-		PrintFunc: printFunc,
+		printFunc: printFunc,
 	}
 
 	runtime.SetFinalizer(w, writerFinalizer)

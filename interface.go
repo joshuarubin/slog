@@ -1,5 +1,14 @@
 package slog
 
+import "io"
+
+// PrefixWriteCloser is an io.WriteCloser that can be prefixed for every line
+// it writes
+type PrefixWriteCloser interface {
+	io.WriteCloser
+	Prefix(prefix string) PrefixWriteCloser
+}
+
 // Interface represents the API of both Logger and Entry.
 type Interface interface {
 	WithFields(fields Fielder) *Entry
@@ -13,4 +22,5 @@ type Interface interface {
 	Panic(msg string)
 	IfError(error) Interface
 	Trace(level Level, msg string) *Entry
+	Writer(level Level) PrefixWriteCloser
 }
