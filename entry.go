@@ -32,6 +32,7 @@ func NewEntry(log *Logger) *Entry {
 func (e *Entry) WithFields(fields Fielder) *Entry {
 	return &Entry{
 		Logger: e.Logger,
+		start:  e.start,
 		fields: append(e.fields, fields.Fields()),
 	}
 }
