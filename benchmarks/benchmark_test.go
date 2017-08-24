@@ -10,12 +10,12 @@ import (
 	"jrubin.io/slog"
 	"jrubin.io/slog/handlers/discard"
 
-	"github.com/Sirupsen/logrus"
 	apex "github.com/apex/log"
 	apexdiscard "github.com/apex/log/handlers/discard"
 	"github.com/go-playground/log"
 	"github.com/go-playground/log/handlers/console"
 	"github.com/inconshreveable/log15"
+	"github.com/sirupsen/logrus"
 )
 
 var errExample = errors.New("fail")
