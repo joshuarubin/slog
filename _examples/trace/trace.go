@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"jrubin.io/slog"
-	"jrubin.io/slog/handlers/text"
+	"github.com/joshuarubin/slog"
+	"github.com/joshuarubin/slog/handlers/text"
 )
 
 func work(ctx slog.Interface) (err error) {

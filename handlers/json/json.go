@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"jrubin.io/slog"
+	"github.com/joshuarubin/slog"
 )
 
 // Default handler outputting to stderr.

@@ -1,7 +1,7 @@
 // Package discard implements a no-op handler useful for benchmarks and tests.
 package discard
 
-import "jrubin.io/slog"
+import "github.com/joshuarubin/slog"
 
 // Default handler.
 var Default = New()

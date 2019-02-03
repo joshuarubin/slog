@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/go-logfmt/logfmt"
-	"jrubin.io/slog"
+	"github.com/joshuarubin/slog"
 )
 
 // Default handler outputting to stderr.

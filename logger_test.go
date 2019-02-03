@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/joshuarubin/slog"
+	"github.com/joshuarubin/slog/handlers/discard"
+	"github.com/joshuarubin/slog/handlers/memory"
+	"github.com/joshuarubin/slog/handlers/text"
 	"github.com/stretchr/testify/assert"
-	"jrubin.io/slog"
-	"jrubin.io/slog/handlers/discard"
-	"jrubin.io/slog/handlers/memory"
-	"jrubin.io/slog/handlers/text"
 )
 
 type Pet struct {

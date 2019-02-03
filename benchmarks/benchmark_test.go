@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"jrubin.io/slog"
-	"jrubin.io/slog/handlers/discard"
+	"github.com/joshuarubin/slog"
+	"github.com/joshuarubin/slog/handlers/discard"
 
 	apex "github.com/apex/log"
 	apexdiscard "github.com/apex/log/handlers/discard"
@@ -38,12 +38,11 @@ var _jane = user{
 // annoying because you have to manipulate the TestMain before
 // running the benchmark you want.
 func TestMain(m *testing.M) {
-	cLog := console.New()
+	cLog := console.New(false)
 	cLog.SetDisplayColor(false)
 	cLog.SetWriter(ioutil.Discard)
-	cLog.SetBuffersAndWorkers(3, 3)
 
-	log.RegisterHandler(cLog, log.AllLevels...)
+	log.AddHandler(cLog, log.AllLevels...)
 
 	logrus.SetFormatter(&logrus.TextFormatter{})
 	logrus.SetOutput(ioutil.Discard)
